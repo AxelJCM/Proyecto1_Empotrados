@@ -1,41 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { w3cwebsocket as W3CWebSocket } from "websocket";
-
-const client = new W3CWebSocket('ws://localhost:8080');
+import React, { useState } from 'react';
+import Login from './Login';
 
 function App() {
-  const [message, setMessage] = useState('');
-  const [serverMessage, setServerMessage] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
-    client.onopen = () => {
-      console.log('WebSocket Client Connected');
-    };
-
-    client.onmessage = (message) => {
-      setServerMessage(message.data);
-    };
-
-    return () => {
-      client.close();
-    };
-  }, []);
-
-  const sendMessage = () => {
-    client.send(message);
+  const handleLogin = () => {
+    setIsAuthenticated(true);
   };
 
   return (
     <div className="App">
-      <h1>React WebSocket Client</h1>
-      <input 
-        type="text" 
-        value={message} 
-        onChange={(e) => setMessage(e.target.value)} 
-        placeholder="Escribe un mensaje"
-      />
-      <button onClick={sendMessage}>Enviar al Servidor</button>
-      <h2>Mensaje del Servidor: {serverMessage}</h2>
+      {!isAuthenticated ? (
+        <Login onLogin={handleLogin} />
+      ) : (
+        <div>
+          <h1>Bienvenido a la Casa Inteligente</h1>
+          {/* Aquí se puede cargar la interfaz principal */}
+        </div>
+      )}
     </div>
   );
 }
