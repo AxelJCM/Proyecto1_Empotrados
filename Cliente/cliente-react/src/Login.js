@@ -7,20 +7,27 @@ function Login({ onLogin }) {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');  // Resetea cualquier error previo
 
-    // Realiza la solicitud al servidor para autenticar al usuario
-    const response = await fetch('http://localhost:8080/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      const response = await fetch('http://localhost:8080/login', {  // URL corregida
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (response.ok) {
-      onLogin(); // Llama a onLogin si la autenticación es exitosa
-    } else {
-      setError('Credenciales inválidas');
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('token', data.token);  // Guarda el token en localStorage
+        onLogin(); // Llama a onLogin si la autenticación es exitosa
+      } else {
+        setError('Credenciales inválidas');
+      }
+    } catch (error) {
+      setError('Error de conexión. Inténtalo de nuevo más tarde.');
+      console.error('Error al intentar iniciar sesión:', error);
     }
   };
 
