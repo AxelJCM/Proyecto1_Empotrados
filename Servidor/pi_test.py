@@ -1,6 +1,6 @@
 import ctypes as ct
 import time
-from gpio import *
+from control import *
 
 
 # Pin configuration
@@ -32,7 +32,26 @@ digitalRead(pin2, value_read)
 print("Pin", pin2.decode('utf-8'), "value:", value_read.value.decode('utf-8'))
 
 
-# Disabling the pins
+# Disable the pins
 disablePin(pin1)
 disablePin(pin2)
 disablePin(pin3)
+
+
+# Distance Test
+
+trigger_pin = b"535"    # GPIO23
+echo_pin = b"536"       # GPIO24
+
+pinMode(trigger_pin, b"out")
+pinMode(echo_pin, b"in")
+
+print("asd")
+# Check distance each second for 10 seconds
+for i in range(10):
+    print("Distance:", getDistance(trigger_pin, echo_pin))
+    time.sleep(1)
+
+# Disable the pins
+disablePin(trigger_pin)
+disablePin(echo_pin)
