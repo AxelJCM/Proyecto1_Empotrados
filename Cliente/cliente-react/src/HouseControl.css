@@ -1,0 +1,61 @@
+.house-control {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  
+  section {
+    margin-bottom: 30px;
+  }
+  
+  h2, h3 {
+    color: #333;
+  }
+  
+  .lights, .doors {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .light, .door {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    width: 150px;
+    text-align: center;
+  }
+  
+  .light button, .door button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .light button:hover, .door button:hover {
+    background-color: #0056b3;
+  }
+  
+  .light.on {
+    background-color: #ffeb3b; /* Amarillo cuando la luz está encendida */
+  }
+  
+  .door.open {
+    background-color: #4caf50; /* Verde cuando la puerta está abierta */
+  }
+  
+  .camera-section img {
+    display: block;
+    margin-top: 10px;
+    max-width: 100%;
+  }
+  
+  .motion-section {
+    font-size: 18px;
+    color: #ff5722; /* Naranja para el sensor de movimiento */
+  }
+  
