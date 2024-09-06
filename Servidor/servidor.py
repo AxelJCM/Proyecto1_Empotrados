@@ -3,6 +3,8 @@ import jwt
 import datetime
 from flask_cors import CORS
 
+#5 luces 4 puertas un sensor de movimiento
+
 app = Flask(__name__)
 CORS(app)  # Aplica CORS después de definir `app`
 
