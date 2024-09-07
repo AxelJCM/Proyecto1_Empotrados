@@ -75,4 +75,4 @@ if __name__ == '__main__':
 
     # todo: crear hilo para el sensor ultrasonico
     
-    app.run(host='192.168.0.100', port=6000)
+    app.run(host='0.0.0.0', port=8080)
