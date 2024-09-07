@@ -205,3 +205,23 @@ int getDistance(const char *trigger_pin, const char *echo_pin)
 
     return d;
 }
+
+
+int takePicture(const char *filename) {
+    // Construct the command string
+    char command[256];
+    snprintf(command, sizeof(command), "fswebcam %s", filename);
+    
+    // Execute the command
+    int result = system(command);
+    
+    // Check for errors
+    if (result == -1) {
+        perror("system");
+        return -1;
+    } else if (result != 0) {
+        fprintf(stderr, "Command failed with status %d\n", result);
+        return -1;
+    }
+    return 0;
+}

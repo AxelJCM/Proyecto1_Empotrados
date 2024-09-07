@@ -37,6 +37,7 @@ disablePin(pin2)
 disablePin(pin3)
 
 
+
 # Distance Test
 
 trigger_pin = b"535"    # GPIO23
@@ -54,3 +55,8 @@ for i in range(10):
 # Disable the pins
 disablePin(trigger_pin)
 disablePin(echo_pin)
+
+
+# Take picture test
+
+takePicture(b"hola.jpg")

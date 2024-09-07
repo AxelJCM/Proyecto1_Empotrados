@@ -42,3 +42,7 @@ def pulseIn(pin:bytes, state:bytes, timeout:int):
 # -1 if error, or 0 if timeout
 def getDistance(trigger_pin:bytes, echo_pin:bytes):
     return func.getDistance(trigger_pin, echo_pin)
+
+
+def takePicture(name:bytes):
+    return func.takePicture(name)

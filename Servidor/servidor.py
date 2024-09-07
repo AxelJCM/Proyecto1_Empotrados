@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+import json
 import jwt
 import datetime
 from flask_cors import CORS
@@ -71,4 +72,7 @@ def take_photo():
     return jsonify({"photoUrl": "http://localhost:8080/static/photo.jpg"}), 200
 
 if __name__ == '__main__':
+
+    # todo: crear hilo para el sensor ultrasonico
+    
     app.run(host='192.168.0.100', port=6000)

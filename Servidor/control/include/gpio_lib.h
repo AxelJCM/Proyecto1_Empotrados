@@ -33,4 +33,8 @@ int pulseIn(const char *pin, const char* state, unsigned int timeout);
 // -1 if error, or 0 if timeout
 int getDistance(const char *trigger_pin, const char *echo_pin);
 
+
+// Takes a picture with fswebcam returns -1 if error
+int takePicture(const char *filename);
+
 #endif // GPIO_H
