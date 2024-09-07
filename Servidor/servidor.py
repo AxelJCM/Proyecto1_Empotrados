@@ -71,4 +71,4 @@ def take_photo():
     return jsonify({"photoUrl": "http://localhost:8080/static/photo.jpg"}), 200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='192.168.0.100', port=6000)
