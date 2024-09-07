@@ -1,8 +1,8 @@
 from ctypes import *
 import time
 
-#so_file = "/usr/lib/libgpio.so.0"
-so_file = "/lib/libgpio_d.so"
+so_file = "/usr/lib/libgpio.so.0"
+#so_file = "/lib/libgpio_d.so"
 func = CDLL(so_file)
 
 # Returns 0 if succesful or -1 in case of error

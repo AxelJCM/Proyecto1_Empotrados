@@ -2,7 +2,6 @@ import ctypes as ct
 import time
 from control import *
 
-
 # Pin configuration
 
 pin1 = b"529"   # GPIO17
@@ -46,7 +45,7 @@ echo_pin = b"536"       # GPIO24
 pinMode(trigger_pin, b"out")
 pinMode(echo_pin, b"in")
 
-print("asd")
+
 # Check distance each second for 10 seconds
 for i in range(10):
     print("Distance:", getDistance(trigger_pin, echo_pin))
