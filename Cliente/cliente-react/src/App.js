@@ -1,26 +1,106 @@
-import React, { useState } from 'react';
-import Login from './Login';
-import HouseControl from './HouseControl'; // Importa el componente de control de la casa
+import React, { useState, useEffect } from 'react';
+import './App.css';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [lightStatus, setLightStatus] = useState({
+    cuarto1: false,
+    cuarto2: false,
+    sala: false,
+    comedor: false,
+    cocina: false
+  });
 
-  const handleLogin = () => {
-    setIsAuthenticated(true); // Actualiza la autenticación
+  const [doorStatus, setDoorStatus] = useState({
+    cuarto1: false,
+    delantera: false,
+    trasera: false,
+    cuarto2: false
+  });
+
+  const [motionSensor, setMotionSensor] = useState('Sin Movimiento');
+  const [photo, setPhoto] = useState(null);
+
+  useEffect(() => {
+    fetchStatus(); // Llama a la función para obtener el estado inicial de luces, puertas y sensor
+  }, []);
+
+  const fetchStatus = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/status'); // Ajusta la URL al endpoint correcto de tu servidor Flask
+      const data = await response.json();
+      setLightStatus(data.lights);
+      setDoorStatus(data.doors);
+      setMotionSensor(data.motion);
+    } catch (error) {
+      console.error('Error al obtener el estado:', error);
+    }
+  };
+
+  const toggleLight = async (light) => {
+    const updatedLightStatus = { ...lightStatus, [light]: !lightStatus[light] };
+    setLightStatus(updatedLightStatus);
+
+    try {
+      await fetch(`http://localhost:8080/lights/${light}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ state: updatedLightStatus[light] ? 'on' : 'off' })
+      });
+    } catch (error) {
+      console.error('Error al cambiar el estado de la luz:', error);
+    }
+  };
+
+  const takePhoto = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/take-photo', { method: 'POST' });
+      const data = await response.json();
+      setPhoto(data.photoUrl);
+    } catch (error) {
+      console.error('Error al tomar la foto:', error);
+    }
   };
 
   return (
-    <div className="App">
-      <h1>Casa Inteligente</h1>
+    <div className="house-control">
+      <h1>Home Manager</h1>
 
-      {!isAuthenticated ? (
-        <Login onLogin={handleLogin} />  // El login aparece solo cuando no está autenticado
-      ) : (
-        <p>Autenticación exitosa. Controla tu casa abajo:</p>
-      )}
+      <section>
+        <h2>Luces</h2>
+        <div className="lights-grid">
+          {Object.keys(lightStatus).map((room) => (
+            <div key={room} className="light-card" onClick={() => toggleLight(room)}>
+              <span>{room.charAt(0).toUpperCase() + room.slice(1)}</span>
+              <span className="light-icon">{lightStatus[room] ? '💡' : '💤'}</span>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      {/* Cargar el resto de la interfaz siempre, pero con condicionales según autenticación */}
-      <HouseControl isAuthenticated={isAuthenticated} />  {/* Mostrar el control de la casa */}
+      <section>
+        <h2>Puertas</h2>
+        <div className="doors-grid">
+          {Object.keys(doorStatus).map((door) => (
+            <div key={door} className="door-card">
+              <span>{door.charAt(0).toUpperCase() + door.slice(1)}</span>
+              <span className="door-icon">{doorStatus[door] ? '🔒' : '🔓'}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h2>Sensor de Movimiento</h2>
+        <div className="motion-sensor">
+          <p>{motionSensor}</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Cámara</h2>
+        <button className="camera-button" onClick={takePhoto}>Toma una foto del Patio Trasero</button>
+        {photo && <img src={photo} alt="Foto del Patio Trasero" />}
+      </section>
     </div>
   );
 }

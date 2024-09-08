@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './HouseControl.css';  // Importar el archivo CSS
+import './HouseControl.css';  // Archivo CSS para estilos
 
 const HouseControl = ({ isAuthenticated }) => {
   const [lightStatus, setLightStatus] = useState(Array(5).fill('off')); // Estado de 5 luces
@@ -9,61 +9,73 @@ const HouseControl = ({ isAuthenticated }) => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      // Llamadas iniciales para obtener el estado
       fetchLightsStatus();
       fetchDoorsStatus();
       fetchMotionSensorStatus();
 
-      // Configurar intervalos para actualización automática cada 5 segundos (5000 ms)
       const intervalId = setInterval(() => {
         fetchLightsStatus();
         fetchDoorsStatus();
         fetchMotionSensorStatus();
-      }, 5000); // Cambia este valor si prefieres otra frecuencia de actualización
+      }, 5000);
 
-      // Limpiar el intervalo cuando el componente se desmonte
       return () => clearInterval(intervalId);
     }
   }, [isAuthenticated]);
 
   const fetchLightsStatus = async () => {
-    // Obtener el estado de las luces desde el servidor
-    const response = await fetch('http://localhost:8080/lights');
-    const data = await response.json();
-    setLightStatus(data.lights);
+    try {
+      const response = await fetch('http://localhost:8080/lights');
+      const data = await response.json();
+      setLightStatus(data.lights);
+    } catch (error) {
+      console.error('Error al obtener el estado de las luces:', error);
+    }
   };
 
   const fetchDoorsStatus = async () => {
-    // Obtener el estado de las puertas desde el servidor
-    const response = await fetch('http://localhost:8080/doors');
-    const data = await response.json();
-    setDoorStatus(data.doors);
+    try {
+      const response = await fetch('http://localhost:8080/doors');
+      const data = await response.json();
+      setDoorStatus(data.doors);
+    } catch (error) {
+      console.error('Error al obtener el estado de las puertas:', error);
+    }
   };
 
   const fetchMotionSensorStatus = async () => {
-    // Obtener el estado del sensor de movimiento
-    const response = await fetch('http://localhost:8080/motion-sensor');
-    const data = await response.json();
-    setMotionSensor(data.status);
+    try {
+      const response = await fetch('http://localhost:8080/motion-sensor');
+      const data = await response.json();
+      setMotionSensor(data.status);
+    } catch (error) {
+      console.error('Error al obtener el estado del sensor de movimiento:', error);
+    }
   };
 
   const toggleLight = async (index) => {
     const newStatus = lightStatus[index] === 'on' ? 'off' : 'on';
     setLightStatus([...lightStatus.slice(0, index), newStatus, ...lightStatus.slice(index + 1)]);
 
-    await fetch(`http://localhost:8080/lights/${index}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ state: newStatus }),
-    });
+    try {
+      await fetch(`http://localhost:8080/lights/${index}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ state: newStatus }),
+      });
+    } catch (error) {
+      console.error('Error al cambiar el estado de la luz:', error);
+    }
   };
 
   const takePhoto = async () => {
-    const response = await fetch('http://localhost:8080/take-photo', {
-      method: 'POST',
-    });
-    const data = await response.json();
-    setPhoto(data.photoUrl);
+    try {
+      const response = await fetch('http://localhost:8080/take-photo', { method: 'POST' });
+      const data = await response.json();
+      setPhoto(data.photoUrl);
+    } catch (error) {
+      console.error('Error al tomar la foto:', error);
+    }
   };
 
   if (!isAuthenticated) {
@@ -72,7 +84,7 @@ const HouseControl = ({ isAuthenticated }) => {
 
   return (
     <div className="house-control">
-      <h2>Control de la Casa Inteligente</h2>
+      <h2>Home Manager</h2>
 
       {/* Control de luces */}
       <section className="lights-section">
@@ -80,16 +92,19 @@ const HouseControl = ({ isAuthenticated }) => {
         <div className="lights">
           {lightStatus.map((light, index) => (
             <div key={index} className="light">
-              <span>{`Luz ${index + 1}: ${light}`}</span>
-              <button onClick={() => toggleLight(index)}>
-                {light === 'on' ? 'Apagar' : 'Encender'}
+              <span>{`Cuarto ${index + 1}`}</span>
+              <button
+                className={`light-button ${light === 'on' ? 'on' : 'off'}`}
+                onClick={() => toggleLight(index)}
+              >
+                {light === 'on' ? '💡 Encendida' : '💤 Apagada'}
               </button>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Control de puertas */}
+      {/* Visualización de puertas */}
       <section className="doors-section">
         <h3>Puertas</h3>
         <div className="doors">
@@ -107,7 +122,7 @@ const HouseControl = ({ isAuthenticated }) => {
         <p>{motionSensor}</p>
       </section>
 
-      {/* Control de la cámara */}
+      {/* Cámara */}
       <section className="camera-section">
         <h3>Cámara</h3>
         <button onClick={takePhoto}>Tomar Foto</button>
@@ -118,3 +133,4 @@ const HouseControl = ({ isAuthenticated }) => {
 };
 
 export default HouseControl;
+

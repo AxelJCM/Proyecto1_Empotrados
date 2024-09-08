@@ -1,38 +1,51 @@
-.App {
+.house-control {
   text-align: center;
+  font-family: Arial, sans-serif;
+  color: #fff;
+  background-color: #333;
+  padding: 20px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.lights-grid, .doors-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  justify-items: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.light-card, .door-card {
+  background-color: #444;
+  padding: 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.light-card:hover, .door-card:hover {
+  background-color: #555;
+}
+
+.light-icon, .door-icon {
+  font-size: 24px;
+  display: block;
+  margin-top: 10px;
+}
+
+.camera-button {
+  padding: 10px 20px;
+  background-color: red;
   color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.App-link {
-  color: #61dafb;
+.camera-button:hover {
+  background-color: darkred;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+img {
+  margin-top: 20px;
+  max-width: 100%;
+  height: auto;
 }
