@@ -158,7 +158,7 @@ def get_doors_status():
 @app.route('/motion-sensor', methods=['GET'])
 def get_motion_sensor_status():
 
-    picture = conversephoto("sensorphoto.jpg", 110)
+    picture = conversephoto("/sensorphoto.jpg", 110)
 
     return jsonify({"image": picture}), 200
   
@@ -167,7 +167,7 @@ def get_motion_sensor_status():
 @app.route('/take-photo', methods=['POST'])
 def take_photo():
     takePicture(b"camera.jpg")
-    picture = conversephoto("camara.jpg")
+    picture = conversephoto("/camara.jpg")
 
     # De momento, devolvemos una URL de ejemplo.
     return jsonify({"photo": picture}), 200
