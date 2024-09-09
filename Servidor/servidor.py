@@ -26,33 +26,35 @@ stop = False
 
 # Estado inicial de las luces, puertas y sensor de movimiento
 lights = ['off', 'off', 'off', 'off', 'off']  # 5 luces
+lights_pins = [b"517", b"518", b"525", b"531", b"538"]  # 5 luces
 doors = ['closed', 'closed', 'closed', 'closed']  # 4 puertas
+doors_pins = [b"529", b"539", b"534", b"516"]
 motion_sensor = 'No motion'  # Sensor de movimiento
 
 # Pin configuration
 # Lights
-light_0 = b"517"   # GPIO5 #LightRoom1
+'''light_0 = b"517"   # GPIO5 #LightRoom1
 light_1 = b"518"   # GPIO6 #LightRoom2
 light_2 = b"525"   # GPIO13 #LightHall
 ligth_3 = b"531"  #GPIO19 #LightLiving
-light_4 = b"538"  #GPIO26 #LightKitchen
+light_4 = b"538"  #GPIO26 #LightKitchen'''
 
-pinMode(light_0, b"out")
-pinMode(light_1, b"out")
-pinMode(light_2, b"out")
-pinMode(ligth_3, b"out")
-pinMode(light_4, b"out")
+pinMode(lights_pins[0], b"out")
+pinMode(lights_pins[1], b"out")
+pinMode(lights_pins[2], b"out")
+pinMode(lights_pins[3], b"out")
+pinMode(lights_pins[4], b"out")
 
 # Doors
-door_1 = b"529"  #GPIO17  #Principal
+'''door_1 = b"529"  #GPIO17  #Principal
 door_2 = b"539"  #GPIO27  #Hall
 door_3 = b"534"  #GPIO22   #Room1
-door_4 = b"516"  #GPIO4    #Room2
+door_4 = b"516"  #GPIO4    #Room2'''
 
-pinMode(door_1, b"in")
-pinMode(door_2, b"in")
-pinMode(door_3, b"in")
-pinMode(door_4 , b"in")
+pinMode(doors_pins[0], b"in")
+pinMode(doors_pins[1], b"in")
+pinMode(doors_pins[2], b"in")
+pinMode(doors_pins[3] , b"in")
 
 #Sensor
 trigger_pin = b"535"    # GPIO23
@@ -124,13 +126,13 @@ def change_light_status(light_id):
         return jsonify({"message": "Invalid state"}), 400
 
     if (new_state == 'on'):
-        pinl = 'light_'+ str(light_id)
+        pinl = lights_pins[light_id]
         digitalWrite(pinl, b"1")
         lights[light_id] = new_state
         return jsonify({"message": f"Luz {light_id + 1} {new_state}"}), 200
     
     elif (new_state == 'off'):
-        pinl = 'light_'+ light_id
+        pinl = lights_pins[light_id]
         digitalWrite(pinl, b"0")
         lights[light_id] = new_state
         return jsonify({"message": f"Luz {light_id + 1} {new_state}"}), 200
@@ -142,7 +144,7 @@ def get_doors_status():
     
     for i in range(len(doors)):
         value_read = ct.create_string_buffer(4) # string buffer
-        pind = 'door_'+ str(i)
+        pind = doors_pins[i]
         digitalRead(pind, value_read)
         
         if (value_read.value.decode('utf-8') == str(1)):
