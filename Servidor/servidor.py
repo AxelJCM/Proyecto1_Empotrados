@@ -81,7 +81,7 @@ def sensor_state():
         distancia = getDistance(trigger_pin, echo_pin)
         
         if (0 < distancia < 15):
-            takePicture("sensorphoto.jpg")
+            takePicture(b"sensorphoto.jpg")
 
         time.sleep(1)
         return "Save photo"  
@@ -111,7 +111,7 @@ def get_lights_status():
 
 
 # Ruta para cambiar el estado de una luz
-@app.route('/lights/<int:light_id>/<int:light_state', methods=['POST'])
+@app.route('/lights/<int:light_id>', methods=['POST'])
 def change_light_status(light_id):
 
     if light_id < 0 or light_id >= len(lights):
@@ -124,7 +124,7 @@ def change_light_status(light_id):
         return jsonify({"message": "Invalid state"}), 400
 
     if (new_state == 'on'):
-        pinl = 'light_'+ light_id
+        pinl = 'light_'+ str(light_id)
         digitalWrite(pinl, b"1")
         lights[light_id] = new_state
         return jsonify({"message": f"Luz {light_id + 1} {new_state}"}), 200
@@ -142,7 +142,7 @@ def get_doors_status():
     
     for i in len(doors):
         value_read = ct.create_string_buffer(4) # string buffer
-        pind = 'door_'+ i 
+        pind = 'door_'+ str(i)
         digitalRead(pind, value_read)
         
         if (value_read.value.decode('utf-8') < 0):
@@ -158,16 +158,16 @@ def get_doors_status():
 @app.route('/motion-sensor', methods=['GET'])
 def get_motion_sensor_status():
 
-    picture = conversephoto("/sensorphoto.jpg", 110)
+    picture = conversephoto("sensorphoto.jpg", 110)
 
     return jsonify({"image": picture}), 200
-    9666#
+  
 
 # Ruta para simular tomar una foto
 @app.route('/take-photo', methods=['POST'])
 def take_photo():
-    takePicture("camera.jpg")
-    picture = conversephoto("/camara.jpg")
+    takePicture(b"camera.jpg")
+    picture = conversephoto("camara.jpg")
 
     # De momento, devolvemos una URL de ejemplo.
     return jsonify({"photo": picture}), 200
