@@ -82,7 +82,7 @@ def sensor_state():
     while(stop):
         distancia = getDistance(trigger_pin, echo_pin)
         
-        if (0 < distancia < 15):
+        if (0 < distancia < 10):
             takePicture(b"sensorphoto.jpg")
             print("Save Photo")
 
@@ -171,7 +171,7 @@ def get_doors_status():
 @app.route('/motion-sensor', methods=['GET'])
 def get_motion_sensor_status():
 
-    picture = conversephoto("/sensorphoto.jpg", 110)
+    picture = conversephoto("/sensorphoto.jpg")
 
     return jsonify({"image": picture}), 200
   
