@@ -145,9 +145,9 @@ def get_doors_status():
         pind = 'door_'+ str(i)
         digitalRead(pind, value_read)
         
-        if (value_read.value.decode('utf-8') < 0):
+        if (value_read.value.decode('utf-8') == str(1)):
             doors[i] = 'open'
-        elif(value_read.value.decode('utf-8') == 0):
+        elif(value_read.value.decode('utf-8') == str(0)):
             doors[i] = 'closed'
         
         #print("Pin", pin2.decode('utf-8'), "value:", value_read.value.decode('utf-8'))
