@@ -196,5 +196,5 @@ if __name__ == '__main__':
    
     #Hacer el thread del sensor ultrasonico
     app.run(host='0.0.0.0', port=8080)
-
+    stop = False
     sensor.join()
