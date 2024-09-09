@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-import json
 import jwt
 import datetime
 from flask_cors import CORS
@@ -7,8 +6,10 @@ import ctypes as ct
 import time
 from control import *
 import json
-import cv2
 import threading
+from PIL import Image
+import io
+import base64
 
 app = Flask(__name__)
 CORS(app)  # Aplica CORS después de definir `app`
@@ -61,19 +62,20 @@ pinMode(trigger_pin, b"out")
 pinMode(echo_pin, b"in")
 
 
-#Hacer funcion para la lectura constante del sensor 
-#Hacer funcion para convertir la imagen a valor binarios 
 
-def conversephoto(path, umbral=127):
-    # Cargar la imagen en escala de grises
-    imagen = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-    
-    # Aplicar umbral para convertir la imagen a binario
-    imagen_binaria = cv2.threshold(imagen, umbral, 255, cv2.THRESH_BINARY)
-    
-    return imagen_binaria
+#Funcion para convertir  la imagen a Base64 para enviarla por el Jsonify. 
+def conversephoto(image_path):
+    # Abrir la imagen con Pillow
+    with Image.open(image_path) as img:
+        # Convertir la imagen a un formato de bytes
+        buffered = io.BytesIO()
+        img.save(buffered, format="JPEG")  # Cambia el formato si es necesario
+        # Codificar la imagen en Base64
+        img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
 
+    return img_str
 
+#Funcion para la lectura constante del sensor 
 def sensor_state():
     while(stop):
         distancia = getDistance(trigger_pin, echo_pin)
@@ -159,14 +161,12 @@ def get_motion_sensor_status():
     picture = conversephoto("/sensorphoto.jpg", 110)
 
     return jsonify({"image": picture}), 200
-    #return jsonify({"status": motion_sensor}), 200
+    9666#
 
 # Ruta para simular tomar una foto
 @app.route('/take-photo', methods=['POST'])
 def take_photo():
-    # Aquí puedes integrar código para tomar una foto real si es necesario.
-
-    photo = takePicture("camera.jpg")
+    takePicture("camera.jpg")
     picture = conversephoto("/camara.jpg")
 
     # De momento, devolvemos una URL de ejemplo.

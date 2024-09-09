@@ -43,13 +43,24 @@ const HouseControl = ({ isAuthenticated }) => {
     }
   };
 
+   
+   // Función para restaurar la imagen     
+  function restoreImage(base64String) {
+      // Crear un objeto URL para la cadena Base64
+    const imgSrc = `data:image/jpeg;base64,${base64String}`;
+
+      // Seleccionar el elemento <img> y asignarle el src con la imagen restaurada
+    const imgElement = document.getElementById('restoredImage');
+    imgElement.src = imgSrc;
+  }
+
   const fetchMotionSensorStatus = async () => {
     try {
       const response = await fetch('http://localhost:8080/motion-sensor');
       const data = await response.json();
-      setMotionSensor(data.status);
+      setMotionSensor(data.image);
     } catch (error) {
-      console.error('Error al obtener el estado del sensor de movimiento:', error);
+      console.error('Error al obtener la imagen del sensor de movimiento:', error);
     }
   };
 
@@ -72,7 +83,8 @@ const HouseControl = ({ isAuthenticated }) => {
     try {
       const response = await fetch('http://localhost:8080/take-photo', { method: 'POST' });
       const data = await response.json();
-      setPhoto(data.photoUrl);
+      photo = restoreImage(data.photo)
+      setPhoto(photo);
     } catch (error) {
       console.error('Error al tomar la foto:', error);
     }
