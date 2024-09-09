@@ -3,6 +3,12 @@ import json
 import jwt
 import datetime
 from flask_cors import CORS
+import ctypes as ct
+import time
+from control import *
+import json
+import cv2
+import threading
 
 app = Flask(__name__)
 CORS(app)  # Aplica CORS después de definir `app`
@@ -14,10 +20,72 @@ SECRET_KEY = "supersecretkey"
 VALID_USERNAME = "abc"
 VALID_PASSWORD = "123"
 
+#Flag hilo
+stop = False
+
 # Estado inicial de las luces, puertas y sensor de movimiento
 lights = ['off', 'off', 'off', 'off', 'off']  # 5 luces
 doors = ['closed', 'closed', 'closed', 'closed']  # 4 puertas
 motion_sensor = 'No motion'  # Sensor de movimiento
+
+# Pin configuration
+# Lights
+light_0 = b"517"   # GPIO5 #LightRoom1
+light_1 = b"518"   # GPIO6 #LightRoom2
+light_2 = b"525"   # GPIO13 #LightHall
+ligth_3 = b"531"  #GPIO19 #LightLiving
+light_4 = b"538"  #GPIO26 #LightKitchen
+
+pinMode(light_0, b"out")
+pinMode(light_1, b"out")
+pinMode(light_2, b"out")
+pinMode(ligth_3, b"out")
+pinMode(light_4, b"out")
+
+# Doors
+door_1 = b"529"  #GPIO17  #Principal
+door_2 = b"539"  #GPIO27  #Hall
+door_3 = b"534"  #GPIO22   #Room1
+door_4 = b"516"  #GPIO4    #Room2
+
+pinMode(door_1, b"in")
+pinMode(door_2, b"in")
+pinMode(door_3, b"in")
+pinMode(door_4 , b"in")
+
+#Sensor
+trigger_pin = b"535"    # GPIO23
+echo_pin = b"536"       # GPIO24
+
+pinMode(trigger_pin, b"out")
+pinMode(echo_pin, b"in")
+
+
+#Hacer funcion para la lectura constante del sensor 
+#Hacer funcion para convertir la imagen a valor binarios 
+
+def conversephoto(path, umbral=127):
+    # Cargar la imagen en escala de grises
+    imagen = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+    
+    # Aplicar umbral para convertir la imagen a binario
+    imagen_binaria = cv2.threshold(imagen, umbral, 255, cv2.THRESH_BINARY)
+    
+    return imagen_binaria
+
+
+def sensor_state():
+    while(stop):
+        distancia = getDistance(trigger_pin, echo_pin)
+        
+        if (0 < distancia < 15):
+            takePicture("sensorphoto.jpg")
+
+        time.sleep(1)
+        return "Save photo"  
+
+
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -34,14 +102,16 @@ def login():
     else:
         return jsonify({"message": "Invalid Credentials"}), 401
 
-# Ruta para obtener el estado de las luces
+# Ruta para obtener el estado de las luces (No se puede obtener el valor de un pin in)
 @app.route('/lights', methods=['GET'])
 def get_lights_status():
     return jsonify({"lights": lights}), 200
 
+
 # Ruta para cambiar el estado de una luz
-@app.route('/lights/<int:light_id>', methods=['POST'])
+@app.route('/lights/<int:light_id>/<int:light_state', methods=['POST'])
 def change_light_status(light_id):
+
     if light_id < 0 or light_id >= len(lights):
         return jsonify({"message": "Invalid light ID"}), 400
 
@@ -51,28 +121,69 @@ def change_light_status(light_id):
     if new_state not in ['on', 'off']:
         return jsonify({"message": "Invalid state"}), 400
 
-    lights[light_id] = new_state
-    return jsonify({"message": f"Luz {light_id + 1} {new_state}"}), 200
+    if (new_state == 'on'):
+        pinl = 'light_'+ light_id
+        digitalWrite(pinl, b"1")
+        lights[light_id] = new_state
+        return jsonify({"message": f"Luz {light_id + 1} {new_state}"}), 200
+    
+    elif (new_state == 'off'):
+        pinl = 'light_'+ light_id
+        digitalWrite(pinl, b"0")
+        lights[light_id] = new_state
+        return jsonify({"message": f"Luz {light_id + 1} {new_state}"}), 200
+
 
 # Ruta para obtener el estado de las puertas
 @app.route('/doors', methods=['GET'])
 def get_doors_status():
+    
+    for i in len(doors):
+        value_read = ct.create_string_buffer(4) # string buffer
+        pind = 'door_'+ i 
+        digitalRead(pind, value_read)
+        
+        if (value_read.value.decode('utf-8') < 0):
+            doors[i] = 'open'
+        elif(value_read.value.decode('utf-8') == 0):
+            doors[i] = 'closed'
+        
+        #print("Pin", pin2.decode('utf-8'), "value:", value_read.value.decode('utf-8'))
+    
     return jsonify({"doors": doors}), 200
 
 # Ruta para obtener el estado del sensor de movimiento
 @app.route('/motion-sensor', methods=['GET'])
 def get_motion_sensor_status():
-    return jsonify({"status": motion_sensor}), 200
+
+    picture = conversephoto("/sensorphoto.jpg", 110)
+
+    return jsonify({"image": picture}), 200
+    #return jsonify({"status": motion_sensor}), 200
 
 # Ruta para simular tomar una foto
 @app.route('/take-photo', methods=['POST'])
 def take_photo():
     # Aquí puedes integrar código para tomar una foto real si es necesario.
+
+    photo = takePicture("camera.jpg")
+    picture = conversephoto("/camara.jpg")
+
     # De momento, devolvemos una URL de ejemplo.
-    return jsonify({"photoUrl": "http://localhost:8080/static/photo.jpg"}), 200
+    return jsonify({"photo": picture}), 200
+
+
 
 if __name__ == '__main__':
 
-    # todo: crear hilo para el sensor ultrasonico
-    
+    sensor = threading.Thread(target=sensor_state)
+
+    # Iniciar el hilo
+    sensor.start()
+
+   
+    #Hacer el thread del sensor ultrasonico
     app.run(host='0.0.0.0', port=8080)
+
+    stop = True
+    sensor.join()
