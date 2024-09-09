@@ -22,7 +22,7 @@ VALID_USERNAME = "abc"
 VALID_PASSWORD = "123"
 
 #Flag hilo
-stop = False
+stop = True
 
 # Estado inicial de las luces, puertas y sensor de movimiento
 lights = ['off', 'off', 'off', 'off', 'off']  # 5 luces
@@ -84,9 +84,10 @@ def sensor_state():
         
         if (0 < distancia < 15):
             takePicture(b"sensorphoto.jpg")
+            print("Save Photo")
 
         time.sleep(1)
-        return "Save photo"  
+    
 
 
 
@@ -192,10 +193,8 @@ if __name__ == '__main__':
 
     # Iniciar el hilo
     sensor.start()
-
    
     #Hacer el thread del sensor ultrasonico
     app.run(host='0.0.0.0', port=8080)
 
-    stop = True
     sensor.join()
