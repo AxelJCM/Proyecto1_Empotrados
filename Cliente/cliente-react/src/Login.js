@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { HOSTNAME } from './Constant';
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState('');
@@ -10,7 +11,7 @@ function Login({ onLogin }) {
     setError('');  // Resetea cualquier error previo
 
     try {
-      const response = await fetch('http://localhost:8080/login', {  // URL corregida
+      const response = await fetch(`${HOSTNAME}/login`, {  // URL corregida
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

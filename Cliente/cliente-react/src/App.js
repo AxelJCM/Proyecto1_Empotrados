@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import { HOSTNAME } from './Constant';
 
 function App() {
   const [lightStatus, setLightStatus] = useState({
@@ -26,7 +27,7 @@ function App() {
 
   const fetchStatus = async () => {
     try {
-      const response = await fetch('http://localhost:8080/status'); // Ajusta la URL al endpoint correcto de tu servidor Flask
+      const response = await fetch(`${HOSTNAME}/status`); // Ajusta la URL al endpoint correcto de tu servidor Flask
       const data = await response.json();
       setLightStatus(data.lights);
       setDoorStatus(data.doors);
@@ -41,7 +42,7 @@ function App() {
     setLightStatus(updatedLightStatus);
 
     try {
-      await fetch(`http://localhost:8080/lights/${light}`, {
+      await fetch(`${HOSTNAME}/lights/${light}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ state: updatedLightStatus[light] ? 'on' : 'off' })
@@ -53,7 +54,7 @@ function App() {
 
   const takePhoto = async () => {
     try {
-      const response = await fetch('http://localhost:8080/take-photo', { method: 'POST' });
+      const response = await fetch(`${HOSTNAME}/take-photo`, { method: 'POST' });
       const data = await response.json();
       setPhoto(data.photoUrl);
     } catch (error) {

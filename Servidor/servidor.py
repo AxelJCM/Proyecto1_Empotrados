@@ -28,7 +28,7 @@ stop = False
 lights = ['off', 'off', 'off', 'off', 'off']  # 5 luces
 lights_pins = [b"517", b"518", b"525", b"531", b"538"]  # 5 luces
 doors = ['closed', 'closed', 'closed', 'closed']  # 4 puertas
-doors_pins = [b"529", b"539", b"534", b"516"]
+doors_pins = [b"529", b"539", b"534", b"537"]
 motion_sensor = 'No motion'  # Sensor de movimiento
 
 # Pin configuration
@@ -49,7 +49,7 @@ pinMode(lights_pins[4], b"out")
 '''door_1 = b"529"  #GPIO17  #Principal
 door_2 = b"539"  #GPIO27  #Hall
 door_3 = b"534"  #GPIO22   #Room1
-door_4 = b"516"  #GPIO4    #Room2'''
+door_4 = b"537"  #GPIO25    #Room2   '''
 
 pinMode(doors_pins[0], b"in")
 pinMode(doors_pins[1], b"in")
@@ -109,6 +109,16 @@ def login():
 # Ruta para obtener el estado de las luces (No se puede obtener el valor de un pin in)
 @app.route('/lights', methods=['GET'])
 def get_lights_status():
+    for i in range(len(lights_pins)):
+        value_read = ct.create_string_buffer(4) # string buffer
+        pinl = lights_pins[i]
+        digitalRead(pinl, value_read)
+        
+        if (value_read.value.decode('utf-8') == str(1)):
+           lights[i] = 'on'
+        elif(value_read.value.decode('utf-8') == str(0)):
+           lights[i] = 'off'
+
     return jsonify({"lights": lights}), 200
 
 
@@ -142,7 +152,7 @@ def change_light_status(light_id):
 @app.route('/doors', methods=['GET'])
 def get_doors_status():
     
-    for i in range(len(doors)):
+    for i in range(len(doors_pins)):
         value_read = ct.create_string_buffer(4) # string buffer
         pind = doors_pins[i]
         digitalRead(pind, value_read)

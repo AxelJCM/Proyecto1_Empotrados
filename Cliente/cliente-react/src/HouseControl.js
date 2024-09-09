@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './HouseControl.css';  // Archivo CSS para estilos
+import { HOSTNAME } from './Constant';
 
 const HouseControl = ({ isAuthenticated }) => {
   const [lightStatus, setLightStatus] = useState(Array(5).fill('off')); // Estado de 5 luces
   const [doorStatus, setDoorStatus] = useState(Array(4).fill('closed')); // Estado de 4 puertas
   const [motionSensor, setMotionSensor] = useState('No motion'); // Estado del sensor de movimiento
   const [photo, setPhoto] = useState(null);
+ 
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -25,7 +27,7 @@ const HouseControl = ({ isAuthenticated }) => {
 
   const fetchLightsStatus = async () => {
     try {
-      const response = await fetch('http://localhost:8080/lights');
+      const response = await fetch(`${HOSTNAME}/lights`);
       const data = await response.json();
       setLightStatus(data.lights);
     } catch (error) {
@@ -35,7 +37,7 @@ const HouseControl = ({ isAuthenticated }) => {
 
   const fetchDoorsStatus = async () => {
     try {
-      const response = await fetch('http://localhost:8080/doors');
+      const response = await fetch(`${HOSTNAME}/doors`);
       const data = await response.json();
       setDoorStatus(data.doors);
     } catch (error) {
@@ -56,7 +58,7 @@ const HouseControl = ({ isAuthenticated }) => {
 
   const fetchMotionSensorStatus = async () => {
     try {
-      const response = await fetch('http://localhost:8080/motion-sensor');
+      const response = await fetch(`${HOSTNAME}/motion-sensor`);
       const data = await response.json();
       setMotionSensor(data.image);
     } catch (error) {
@@ -69,7 +71,7 @@ const HouseControl = ({ isAuthenticated }) => {
     setLightStatus([...lightStatus.slice(0, index), newStatus, ...lightStatus.slice(index + 1)]);
 
     try {
-      await fetch(`http://localhost:8080/lights/${index}`, {
+      await fetch(`${HOSTNAME}/lights/${index}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ state: newStatus }),
@@ -81,7 +83,7 @@ const HouseControl = ({ isAuthenticated }) => {
 
   const takePhoto = async () => {
     try {
-      const response = await fetch('http://localhost:8080/take-photo', { method: 'POST' });
+      const response = await fetch(`${HOSTNAME}/take-photo, { method: 'POST' }`);
       const data = await response.json();
       photo = restoreImage(data.photo)
       setPhoto(photo);
