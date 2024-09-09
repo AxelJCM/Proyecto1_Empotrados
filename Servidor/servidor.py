@@ -140,7 +140,7 @@ def change_light_status(light_id):
 @app.route('/doors', methods=['GET'])
 def get_doors_status():
     
-    for i in len(doors):
+    for i in range(len(doors)):
         value_read = ct.create_string_buffer(4) # string buffer
         pind = 'door_'+ str(i)
         digitalRead(pind, value_read)
@@ -167,7 +167,7 @@ def get_motion_sensor_status():
 @app.route('/take-photo', methods=['POST'])
 def take_photo():
     takePicture(b"camera.jpg")
-    picture = conversephoto("/camara.jpg")
+    picture = conversephoto("/camera.jpg")
 
     # De momento, devolvemos una URL de ejemplo.
     return jsonify({"photo": picture}), 200
