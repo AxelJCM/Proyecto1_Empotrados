@@ -8,7 +8,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [lightStatus, setLightStatus] = useState({});
   const [doorStatus, setDoorStatus] = useState({});
-  const [motionSensor, setMotionSensor] = useState('No motion');
+  const [motionSensor, setMotionSensor] = useState(null);
   const [photo, setPhoto] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || '');
 

@@ -184,7 +184,7 @@ def get_motion_sensor_status():
 
     picture = conversephoto("/sensorphoto.jpg")
 
-    return jsonify({"image": picture}), 200
+    return jsonify({"photo": picture}), 200
   
 
 # Ruta para simular tomar una foto

@@ -18,7 +18,7 @@ const HouseControl = ({ onLogout }) => {
     cuarto2: 'closed'
   });
 
-  const [motionSensor, setMotionSensor] = useState('No motion');
+  const [motionSensor, setMotionSensor] = useState(null);
   const [photo, setPhoto] = useState(null);
   const [activeTab, setActiveTab] = useState('lights');  // Estado para manejar las pestañas
 
@@ -108,6 +108,31 @@ const HouseControl = ({ onLogout }) => {
     }
   };
 
+  const updateSensor = async () => {
+    try {
+      const response = await fetch(`${HOSTNAME}/motion-sensor`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      console.log('Response status:', response.status); // Log response status
+  
+      if (response.ok) {
+        const data = await response.json();
+        setMotionSensor(`data:image/jpeg;base64,${data.photo}`);
+      } else if (response.status === 401) {
+        onLogout(); // Handle invalid or expired token
+      } else {
+        console.error('Unexpected response status:', response.status); // Handle other status codes
+      }
+    } catch (error) {
+      console.error('Error fetching sensor data:', error);
+    }
+  };
+  
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     onLogout();
@@ -166,7 +191,8 @@ const HouseControl = ({ onLogout }) => {
       {activeTab === 'sensor' && (
         <section className="sensor-section">
           <h3>Sensor de Movimiento</h3>
-          <p>{motionSensor}</p>
+          <button onClick={updateSensor}>Última Foto</button>
+          {motionSensor && <img src={motionSensor} alt="Foto del sensor de movimiento" />}
 
           <h3>Cámara</h3>
           <button onClick={takePhoto}>Tomar Foto</button>
