@@ -179,7 +179,7 @@ def get_doors_status():
     return jsonify({"doors": doors}), 200
 
 # Ruta para obtener el estado del sensor de movimiento
-@app.route('/motion-sensor', methods=['GET'])
+@app.route('/motion-sensor', methods=['POST'])
 def get_motion_sensor_status():
 
     picture = conversephoto("/sensorphoto.jpg")
