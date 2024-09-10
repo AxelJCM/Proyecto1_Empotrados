@@ -1,39 +1,37 @@
-.light-button {
-  background-color: transparent;
-  border: 2px solid #fff;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 10px 20px;
-  margin-top: 10px;
+.house-control {
+  font-family: Arial, sans-serif;
+}
+
+.lights-section, .doors-section, .motion-section, .camera-section {
+  margin-bottom: 20px;
+}
+
+.lights-grid, .doors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.light-card, .door-card {
+  padding: 10px;
+  border: 1px solid #ccc;
   border-radius: 5px;
-  text-transform: uppercase;
-}
-
-.light-button.on {
-  background-color: yellow;
-  color: black;
-}
-
-.light-button.off {
-  background-color: gray;
-}
-
-.light {
-  display: inline-block;
-  margin: 10px;
   text-align: center;
 }
 
-.lights-section {
-  margin: 20px 0;
+.light-button.on {
+  background-color: #ff0;
 }
 
-.doors-section, .motion-section, .camera-section {
-  margin: 20px 0;
+.light-button.off {
+  background-color: #ccc;
 }
 
-img {
-  margin-top: 10px;
+.door-icon {
+  font-size: 20px;
+}
+
+.camera-section img {
   max-width: 100%;
+  height: auto;
 }

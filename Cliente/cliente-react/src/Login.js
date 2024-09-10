@@ -1,62 +1,46 @@
 import React, { useState } from 'react';
-import { HOSTNAME } from './Constant';
+import './Login.css';  // Importa el archivo CSS para el diseño
 
-function Login({ onLogin }) {
+function Login({ handleLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError('');  // Resetea cualquier error previo
-
-    try {
-      const response = await fetch(`${HOSTNAME}/login`, {  // URL corregida
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('token', data.token);  // Guarda el token en localStorage
-        onLogin(); // Llama a onLogin si la autenticación es exitosa
-      } else {
-        setError('Credenciales inválidas');
-      }
-    } catch (error) {
-      setError('Error de conexión. Inténtalo de nuevo más tarde.');
-      console.error('Error al intentar iniciar sesión:', error);
-    }
+    handleLogin(username, password);
   };
 
   return (
     <div className="login-container">
-      <h2>Inicio de Sesión</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Nombre de usuario:</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Contraseña:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit">Iniciar Sesión</button>
-      </form>
+      <div className="login-card">
+        <h2>Login</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="input-group">
+            <label>Nombre de usuario:</label>
+            <input
+              type="text"
+              placeholder="Usuario"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label>Contraseña:</label>
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          {error && <p className="error-message">{error}</p>}
+          <button type="submit" className="login-button">Iniciar Sesión</button>
+        </form>
+      </div>
     </div>
   );
 }

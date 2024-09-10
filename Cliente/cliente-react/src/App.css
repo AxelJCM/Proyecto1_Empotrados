@@ -1,51 +1,42 @@
+/* App.css */
 .house-control {
-  text-align: center;
   font-family: Arial, sans-serif;
-  color: #fff;
-  background-color: #333;
-  padding: 20px;
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 1em;
+}
+
+.tabs button {
+  background-color: #ddd;
+  border: none;
+  padding: 1em;
+  margin-right: 1em;
+  cursor: pointer;
+}
+
+.tabs button.active {
+  background-color: #aaa;
+}
+
+section {
+  margin-top: 1em;
 }
 
 .lights-grid, .doors-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  justify-items: center;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .light-card, .door-card {
-  background-color: #444;
-  padding: 20px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.light-card:hover, .door-card:hover {
-  background-color: #555;
+  border: 1px solid #ddd;
+  padding: 1em;
+  margin: 0.5em;
+  flex: 1 1 100px;
+  text-align: center;
 }
 
 .light-icon, .door-icon {
-  font-size: 24px;
-  display: block;
-  margin-top: 10px;
-}
-
-.camera-button {
-  padding: 10px 20px;
-  background-color: red;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.camera-button:hover {
-  background-color: darkred;
-}
-
-img {
-  margin-top: 20px;
-  max-width: 100%;
-  height: auto;
+  font-size: 2em;
 }

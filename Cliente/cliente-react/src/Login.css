@@ -1,0 +1,69 @@
+/* Login.css */
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #1e1e2f;  /* Color de fondo oscuro */
+}
+
+.login-card {
+  background: #2c2c3c;  /* Fondo de la tarjeta de login */
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  padding: 30px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-card h2 {
+  margin-bottom: 20px;
+  color: #e0e0e0;  /* Color de texto claro */
+  font-family: 'Roboto', sans-serif;
+}
+
+.input-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #b0b0b0;  /* Color de etiqueta más claro */
+  font-family: 'Roboto', sans-serif;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #444;
+  border-radius: 5px;
+  font-size: 16px;
+  background: #3c3c4c;  /* Fondo de input oscuro */
+  color: #fff;  /* Texto de input claro */
+}
+
+.error-message {
+  color: #ff4d4d;  /* Color de texto de error */
+  margin-top: 10px;
+}
+
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background: #007bff;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+  transition: background 0.3s;
+}
+
+.login-button:hover {
+  background: #0056b3;
+}

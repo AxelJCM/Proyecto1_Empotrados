@@ -1,81 +1,79 @@
 import React, { useState, useEffect } from 'react';
-import './HouseControl.css';  // Archivo CSS para estilos
+import './App.css';
 import { HOSTNAME } from './Constant';
 
-const HouseControl = ({ isAuthenticated }) => {
-  const [lightStatus, setLightStatus] = useState(Array(5).fill('off')); // Estado de 5 luces
-  const [doorStatus, setDoorStatus] = useState(Array(4).fill('closed')); // Estado de 4 puertas
-  const [motionSensor, setMotionSensor] = useState('No motion'); // Estado del sensor de movimiento
+const HouseControl = ({ onLogout }) => {
+  const [lightStatus, setLightStatus] = useState({
+    cuarto1: 'off',
+    cuarto2: 'off',
+    sala: 'off',
+    comedor: 'off',
+    cocina: 'off'
+  });
+
+  const [doorStatus, setDoorStatus] = useState({
+    cuarto1: 'closed',
+    delantera: 'closed',
+    trasera: 'closed',
+    cuarto2: 'closed'
+  });
+
+  const [motionSensor, setMotionSensor] = useState('No motion');
   const [photo, setPhoto] = useState(null);
- 
+  const [activeTab, setActiveTab] = useState('lights');  // Estado para manejar las pestañas
+
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchLightsStatus();
-      fetchDoorsStatus();
-      fetchMotionSensorStatus();
+    if (token) {
+      fetchStatus();
 
       const intervalId = setInterval(() => {
-        fetchLightsStatus();
-        fetchDoorsStatus();
-        fetchMotionSensorStatus();
+        fetchStatus();
       }, 5000);
 
       return () => clearInterval(intervalId);
+    } else {
+      onLogout();  // Si no hay token, desloguear al usuario
     }
-  }, [isAuthenticated]);
+  }, [token, onLogout]);
 
-  const fetchLightsStatus = async () => {
+  const fetchStatus = async () => {
     try {
-      const response = await fetch(`${HOSTNAME}/lights`);
-      const data = await response.json();
-      setLightStatus(data.lights);
-    } catch (error) {
-      console.error('Error al obtener el estado de las luces:', error);
-    }
-  };
-
-  const fetchDoorsStatus = async () => {
-    try {
-      const response = await fetch(`${HOSTNAME}/doors`);
-      const data = await response.json();
-      setDoorStatus(data.doors);
-    } catch (error) {
-      console.error('Error al obtener el estado de las puertas:', error);
-    }
-  };
-
-   
-   // Función para restaurar la imagen     
-  function restoreImage(base64String) {
-      // Crear un objeto URL para la cadena Base64
-    const imgSrc = `data:image/jpeg;base64,${base64String}`;
-
-      // Seleccionar el elemento <img> y asignarle el src con la imagen restaurada
-    const imgElement = document.getElementById('restoredImage');
-    imgElement.src = imgSrc;
-  }
-
-  const fetchMotionSensorStatus = async () => {
-    try {
-      const response = await fetch(`${HOSTNAME}/motion-sensor`);
-      const data = await response.json();
-      setMotionSensor(data.image);
-    } catch (error) {
-      console.error('Error al obtener la imagen del sensor de movimiento:', error);
-    }
-  };
-
-  const toggleLight = async (index) => {
-    const newStatus = lightStatus[index] === 'on' ? 'off' : 'on';
-    setLightStatus([...lightStatus.slice(0, index), newStatus, ...lightStatus.slice(index + 1)]);
-
-    try {
-      await fetch(`${HOSTNAME}/lights/${index}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ state: newStatus }),
+      const response = await fetch(`${HOSTNAME}/status`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
+      if (response.ok) {
+        const data = await response.json();
+        setLightStatus(data.lights);
+        setDoorStatus(data.doors);
+        setMotionSensor(data.motion);
+      } else if (response.status === 401) {
+        onLogout();  // Token inválido o expirado
+      }
+    } catch (error) {
+      console.error('Error al obtener el estado:', error);
+    }
+  };
+
+  const toggleLight = async (light) => {
+    const newState = lightStatus[light] === 'on' ? 'off' : 'on';
+    setLightStatus({ ...lightStatus, [light]: newState });
+
+    try {
+      const response = await fetch(`${HOSTNAME}/lights/${light}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ state: newState })
+      });
+      if (!response.ok && response.status === 401) {
+        onLogout();  // Token inválido o expirado
+      }
     } catch (error) {
       console.error('Error al cambiar el estado de la luz:', error);
     }
@@ -83,68 +81,90 @@ const HouseControl = ({ isAuthenticated }) => {
 
   const takePhoto = async () => {
     try {
-      const response = await fetch(`${HOSTNAME}/take-photo, { method: 'POST' }`);
-      const data = await response.json();
-      photo = restoreImage(data.photo)
-      setPhoto(photo);
+      const response = await fetch(`${HOSTNAME}/take-photo`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPhoto(`data:image/jpeg;base64,${data.photo}`);
+      } else if (response.status === 401) {
+        onLogout();  // Token inválido o expirado
+      }
     } catch (error) {
       console.error('Error al tomar la foto:', error);
     }
   };
 
-  if (!isAuthenticated) {
-    return <p>Por favor, inicia sesión para controlar la casa.</p>;
-  }
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    onLogout();
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
 
   return (
     <div className="house-control">
       <h2>Home Manager</h2>
+      <button onClick={handleLogout}>Cerrar Sesión</button>
 
-      {/* Control de luces */}
-      <section className="lights-section">
-        <h3>Luces</h3>
-        <div className="lights">
-          {lightStatus.map((light, index) => (
-            <div key={index} className="light">
-              <span>{`Cuarto ${index + 1}`}</span>
-              <button
-                className={`light-button ${light === 'on' ? 'on' : 'off'}`}
-                onClick={() => toggleLight(index)}
-              >
-                {light === 'on' ? '💡 Encendida' : '💤 Apagada'}
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
+      <div className="tabs">
+        <button onClick={() => handleTabChange('lights')} className={activeTab === 'lights' ? 'active' : ''}>Luces</button>
+        <button onClick={() => handleTabChange('doors')} className={activeTab === 'doors' ? 'active' : ''}>Puertas</button>
+        <button onClick={() => handleTabChange('sensor')} className={activeTab === 'sensor' ? 'active' : ''}>Sensor & Cámara</button>
+      </div>
 
-      {/* Visualización de puertas */}
-      <section className="doors-section">
-        <h3>Puertas</h3>
-        <div className="doors">
-          {doorStatus.map((door, index) => (
-            <div key={index} className="door">
-              <span>{`Puerta ${index + 1}: ${door}`}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      {activeTab === 'lights' && (
+        <section className="lights-section">
+          <h3>Luces</h3>
+          <div className="lights-grid">
+            {Object.keys(lightStatus).map((light) => (
+              <div key={light} className="light-card">
+                <span>{light.charAt(0).toUpperCase() + light.slice(1)}</span>
+                <button
+                  className={`light-button ${lightStatus[light] === 'on' ? 'on' : 'off'}`}
+                  onClick={() => toggleLight(light)}
+                >
+                  {lightStatus[light] === 'on' ? '💡 Encendida' : '💤 Apagada'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-      {/* Sensor de movimiento */}
-      <section className="motion-section">
-        <h3>Sensor de Movimiento</h3>
-        <p>{motionSensor}</p>
-      </section>
+      {activeTab === 'doors' && (
+        <section className="doors-section">
+          <h3>Puertas</h3>
+          <div className="doors-grid">
+            {Object.keys(doorStatus).map((door) => (
+              <div key={door} className="door-card">
+                <span>{door.charAt(0).toUpperCase() + door.slice(1)}</span>
+                <span className="door-icon">
+                  {doorStatus[door] === 'closed' ? '🔒 Cerrada' : '🔓 Abierta'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-      {/* Cámara */}
-      <section className="camera-section">
-        <h3>Cámara</h3>
-        <button onClick={takePhoto}>Tomar Foto</button>
-        {photo && <img src={photo} alt="Foto de la casa" />}
-      </section>
+      {activeTab === 'sensor' && (
+        <section className="sensor-section">
+          <h3>Sensor de Movimiento</h3>
+          <p>{motionSensor}</p>
+
+          <h3>Cámara</h3>
+          <button onClick={takePhoto}>Tomar Foto</button>
+          {photo && <img src={photo} alt="Foto de la casa" />}
+        </section>
+      )}
     </div>
   );
 };
 
 export default HouseControl;
-
