@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { HOSTNAME } from './Constant';
 import Tabs from './Tabs';  // Importa el componente de pestañas
-import Login from './Login'; // Importa el componente de inicio de sesión mejorado
+import Login from './Login'; // Asegúrate de que el archivo se llame Login.js
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -106,7 +106,7 @@ function App() {
   }
 
   const lightsTab = (
-    <section>
+    <section className="tab-content">
       <h2>Luces</h2>
       <div className="lights-grid">
         {Object.keys(lightStatus).map((room) => (
@@ -125,7 +125,7 @@ function App() {
   );
 
   const doorsTab = (
-    <section>
+    <section className="tab-content">
       <h2>Puertas</h2>
       <div className="doors-grid">
         {Object.keys(doorStatus).map((door) => (
@@ -140,31 +140,32 @@ function App() {
     </section>
   );
 
-  const motionTab = (
-    <section>
-      <h2>Sensor de Movimiento</h2>
-      <p>{motionSensor}</p>
-    </section>
-  );
-
-  const cameraTab = (
-    <section>
-      <h2>Cámara</h2>
-      <button onClick={handleTakePhoto}>Tomar Foto</button>
-      {photo && <img src={photo} alt="Foto de la casa" />}
+  const motionAndCameraTab = (
+    <section className="tab-content">
+      <h2>Sensor y Cámara</h2>
+      <div className="sensor-camera">
+        <div className="sensor-section">
+          <h3>Sensor de Movimiento</h3>
+          <p>{motionSensor}</p>
+        </div>
+        <div className="camera-section">
+          <h3>Cámara</h3>
+          <button onClick={handleTakePhoto} className="camera-button">Tomar Foto</button>
+          {photo && <img src={photo} alt="Foto de la casa" />}
+        </div>
+      </div>
     </section>
   );
 
   return (
     <div className="house-control">
       <h1>Home Manager</h1>
-      <button onClick={handleLogout}>Cerrar sesión</button>
+      <button onClick={handleLogout} className="logout-button">Cerrar sesión</button>
       <Tabs
         tabs={{
           'luces': lightsTab,
           'puertas': doorsTab,
-          'sensor': motionTab,
-          'cámara': cameraTab
+          'sensor y cámara': motionAndCameraTab
         }}
       />
     </div>

@@ -1,32 +1,27 @@
-// Tabs.js
-import React, { useState } from 'react';
-import './Tabs.css';  // Archivo CSS para los estilos de las pestañas
+import React from 'react';
+import './Tabs.css';
 
-const Tabs = ({ tabs }) => {
-  const [activeTab, setActiveTab] = useState(Object.keys(tabs)[0]);
-
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-  };
+function Tabs({ tabs }) {
+  const [activeTab, setActiveTab] = React.useState(Object.keys(tabs)[0]);
 
   return (
     <div className="tabs-container">
-      <div className="tabs">
-        {Object.keys(tabs).map((tab) => (
-          <button
-            key={tab}
-            className={`tab-button ${activeTab === tab ? 'active' : ''}`}
-            onClick={() => handleTabClick(tab)}
+      <div className="tabs-header">
+        {Object.keys(tabs).map((tabKey) => (
+          <div
+            key={tabKey}
+            className={`tab ${activeTab === tabKey ? 'active' : ''}`}
+            onClick={() => setActiveTab(tabKey)}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
+            {tabKey.charAt(0).toUpperCase() + tabKey.slice(1)}
+          </div>
         ))}
       </div>
-      <div className="tab-content">
+      <div className="tabs-content">
         {tabs[activeTab]}
       </div>
     </div>
   );
-};
+}
 
 export default Tabs;
