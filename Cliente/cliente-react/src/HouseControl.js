@@ -50,12 +50,15 @@ const HouseControl = ({ onLogout }) => {
 
   useEffect(() => {
     if (token) {
+      // Inicializa la obtención del estado
       fetchStatus();
 
+      // Configura el intervalo para actualizar el estado cada 5 segundos
       const intervalId = setInterval(() => {
         fetchStatus();
-      }, 5000);
+      }, 1000);
 
+      // Limpia el intervalo al desmontar el componente
       return () => clearInterval(intervalId);
     } else {
       onLogout();  // Si no hay token, desloguear al usuario
@@ -132,6 +135,15 @@ const HouseControl = ({ onLogout }) => {
     }
   };
   
+  useEffect(() => {
+    // Configura el intervalo para actualizar el sensor de movimiento
+    const sensorIntervalId = setInterval(() => {
+      updateSensor();
+    }, 5000);
+
+    // Limpia el intervalo al desmontar el componente
+    return () => clearInterval(sensorIntervalId);
+  }, [updateSensor]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');

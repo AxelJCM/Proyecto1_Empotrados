@@ -2,14 +2,13 @@ from flask import Flask, request, jsonify
 import jwt
 import datetime
 from flask_cors import CORS
+import random
+import base64
 
 app = Flask(__name__)
 CORS(app)  # Habilita CORS para todas las rutas
 
-# Clave secreta para firmar los tokens
 SECRET_KEY = "supersecretkey"
-
-# Credenciales válidas
 VALID_USERNAME = "abc"
 VALID_PASSWORD = "123"
 
@@ -68,9 +67,23 @@ def token_required(f):
 @app.route('/status', methods=['GET'])
 @token_required
 def get_status():
+    # Imprimir mensaje en la consola cada vez que se llama este endpoint
+    print("Status endpoint called")
+
+    # Simular cambios en luces y puertas
+    simulated_lights = {k: random.choice(['on', 'off']) for k in lights}
+    simulated_doors = {k: random.choice(['open', 'closed']) for k in doors}
+
+    # Simular un estado de sensor de movimiento
+    global motion_sensor
+    if random.choice([True, False]):
+        motion_sensor = "Motion detected"
+    else:
+        motion_sensor = "No motion"
+
     return jsonify({
-        'lights': lights,
-        'doors': doors,
+        'lights': simulated_lights,
+        'doors': simulated_doors,
         'motion': motion_sensor
     }), 200
 
@@ -94,18 +107,25 @@ def change_light_status(light):
 @app.route('/doors', methods=['GET'])
 @token_required
 def get_doors_status():
-    return jsonify({"doors": doors}), 200
+    simulated_doors = {k: random.choice(['open', 'closed']) for k in doors}
+    return jsonify({"doors": simulated_doors}), 200
 
 # Ruta para obtener el estado del sensor de movimiento
 @app.route('/motion-sensor', methods=['GET'])
 @token_required
 def get_motion_sensor_status():
+    global motion_sensor
+    if random.choice([True, False]):
+        motion_sensor = "Motion detected"
+    else:
+        motion_sensor = "No motion"
     return jsonify({"status": motion_sensor}), 200
 
 # Ruta para simular tomar una foto (usando una imagen base64 de ejemplo)
 @app.route('/take-photo', methods=['POST'])
 @token_required
 def take_photo():
+    # Generar una imagen base64 simulada
     simulated_photo_base64 = (
         "iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACt..."
         # Imagen base64 cortada para fines ilustrativos

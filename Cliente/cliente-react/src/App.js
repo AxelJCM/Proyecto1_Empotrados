@@ -10,6 +10,7 @@ function App() {
   const [doorStatus, setDoorStatus] = useState({});
   const [motionSensor, setMotionSensor] = useState(null);
   const [photo, setPhoto] = useState(null);
+  const [sensorPhoto, setSensorPhoto] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || '');
 
   const fetchStatus = useCallback(async () => {
@@ -80,6 +81,22 @@ function App() {
     }
   };
 
+  const handleGetLastPhoto = async () => {
+    try {
+      const response = await fetch(`${HOSTNAME}/motion-sensor`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSensorPhoto(`data:image/jpeg;base64,${data.photo}`);
+      }
+    } catch (error) {
+      console.error('Error al obtener la última foto del sensor:', error);
+    }
+  };
+
   const toggleLight = async (room) => {
     const newState = lightStatus[room] === 'on' ? 'off' : 'on';
     setLightStatus({ ...lightStatus, [room]: newState });
@@ -140,18 +157,20 @@ function App() {
     </section>
   );
 
-  const motionAndCameraTab = (
+  const sensorAndCameraTab = (
     <section className="tab-content">
       <h2>Sensor y Cámara</h2>
       <div className="sensor-camera">
         <div className="sensor-section">
           <h3>Sensor de Movimiento</h3>
           <p>{motionSensor}</p>
+          <button onClick={handleGetLastPhoto} className="sensor-button">Obtener Última Foto del Sensor</button>
+          {sensorPhoto && <img src={sensorPhoto} alt="Última foto del sensor" />}
         </div>
         <div className="camera-section">
           <h3>Cámara</h3>
           <button onClick={handleTakePhoto} className="camera-button">Tomar Foto</button>
-          {photo && <img src={photo} alt="Foto de la casa" />}
+          {photo && <img src={photo} alt="Foto de la cámara" />}
         </div>
       </div>
     </section>
@@ -165,7 +184,7 @@ function App() {
         tabs={{
           'luces': lightsTab,
           'puertas': doorsTab,
-          'sensor y cámara': motionAndCameraTab
+          'sensor y cámara': sensorAndCameraTab
         }}
       />
     </div>
