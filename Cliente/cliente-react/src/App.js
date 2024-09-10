@@ -12,13 +12,6 @@ function App() {
   const [photo, setPhoto] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || '');
 
-  useEffect(() => {
-    if (token) {
-      setIsAuthenticated(true);
-      fetchStatus();
-    }
-  }, [token]);
-
   const fetchStatus = useCallback(async () => {
     try {
       const response = await fetch(`${HOSTNAME}/status`, {
@@ -27,13 +20,20 @@ function App() {
         }
       });
       const data = await response.json();
-      setLightStatus(data.lights);
-      setDoorStatus(data.doors);
-      setMotionSensor(data.motion);
+      setLightStatus(data.lights || {});  // Asegurarse de que siempre es un objeto
+      setDoorStatus(data.doors || {});    // Asegurarse de que siempre es un objeto
+      setMotionSensor(data.motion || 'No motion');
     } catch (error) {
       console.error('Error al obtener el estado:', error);
     }
   }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      setIsAuthenticated(true);
+      fetchStatus(); // Llama a fetchStatus cuando cambie el token
+    }
+  }, [token, fetchStatus]); // Añade fetchStatus como dependencia
 
   const handleLogin = async (username, password) => {
     try {
@@ -109,7 +109,7 @@ function App() {
     <section className="tab-content">
       <h2>Luces</h2>
       <div className="lights-grid">
-        {Object.keys(lightStatus).map((room) => (
+        {Object.keys(lightStatus || {}).map((room) => (
           <div key={room} className="light-card">
             <span>{room.charAt(0).toUpperCase() + room.slice(1)}</span>
             <button
@@ -128,7 +128,7 @@ function App() {
     <section className="tab-content">
       <h2>Puertas</h2>
       <div className="doors-grid">
-        {Object.keys(doorStatus).map((door) => (
+        {Object.keys(doorStatus || {}).map((door) => (
           <div key={door} className="door-card">
             <span>{door.charAt(0).toUpperCase() + door.slice(1)}</span>
             <span className="door-icon">
