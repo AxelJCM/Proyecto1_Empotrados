@@ -110,7 +110,7 @@ def login():
 
 # Ruta para obtener el estado de las luces
 @app.route('/status', methods=['GET'])
-@token_required
+#@token_required
 def get_status():
     return jsonify({
         'lights': lights,
