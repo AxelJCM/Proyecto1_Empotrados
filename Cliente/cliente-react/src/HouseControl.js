@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { HOSTNAME } from './Constant';
 
@@ -24,6 +24,30 @@ const HouseControl = ({ onLogout }) => {
 
   const token = localStorage.getItem('token');
 
+  const fetchStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${HOSTNAME}/status`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      console.log('Response status:', response.status); // Imprimir el estado de la respuesta
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Fetched data:', data); // Imprimir los datos obtenidos del servidor
+        setLightStatus(data.lights);
+        setDoorStatus(data.doors);
+        setMotionSensor(data.motion);
+      } else if (response.status === 401) {
+        onLogout();  // Token inválido o expirado
+      }
+    } catch (error) {
+      console.error('Error al obtener el estado:', error);
+    }
+  }, [token, onLogout]);
+
   useEffect(() => {
     if (token) {
       fetchStatus();
@@ -36,27 +60,7 @@ const HouseControl = ({ onLogout }) => {
     } else {
       onLogout();  // Si no hay token, desloguear al usuario
     }
-  }, [token, onLogout]);
-
-  const fetchStatus = async () => {
-    try {
-      const response = await fetch(`${HOSTNAME}/status`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setLightStatus(data.lights);
-        setDoorStatus(data.doors);
-        setMotionSensor(data.motion);
-      } else if (response.status === 401) {
-        onLogout();  // Token inválido o expirado
-      }
-    } catch (error) {
-      console.error('Error al obtener el estado:', error);
-    }
-  };
+  }, [fetchStatus, token, onLogout]);
 
   const toggleLight = async (light) => {
     const newState = lightStatus[light] === 'on' ? 'off' : 'on';
@@ -71,6 +75,9 @@ const HouseControl = ({ onLogout }) => {
         },
         body: JSON.stringify({ state: newState })
       });
+
+      console.log('Toggle light response status:', response.status); // Imprimir el estado de la respuesta
+
       if (!response.ok && response.status === 401) {
         onLogout();  // Token inválido o expirado
       }
@@ -87,6 +94,9 @@ const HouseControl = ({ onLogout }) => {
           Authorization: `Bearer ${token}`
         }
       });
+
+      console.log('Take photo response status:', response.status); // Imprimir el estado de la respuesta
+
       if (response.ok) {
         const data = await response.json();
         setPhoto(`data:image/jpeg;base64,${data.photo}`);
