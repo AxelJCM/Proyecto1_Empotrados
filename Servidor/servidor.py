@@ -106,6 +106,17 @@ def login():
         return jsonify({"token": token}), 200
     else:
         return jsonify({"message": "Invalid Credentials"}), 401
+    
+
+# Ruta para obtener el estado de las luces
+@app.route('/status', methods=['GET'])
+@token_required
+def get_status():
+    return jsonify({
+        'lights': lights,
+        'doors': doors,
+        'motion': motion_sensor
+    }), 200
 
 # Ruta para obtener el estado de las luces (No se puede obtener el valor de un pin in)
 @app.route('/lights', methods=['GET'])
