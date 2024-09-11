@@ -31,6 +31,23 @@ function App() {
     }
   }, [token]);
 
+  const fetchDoorStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${HOSTNAME}/doors`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      console.log('Door status fetched:', data);  // Depuración: Verificar datos recibidos
+        
+    } catch (error) {
+      console.error('Error al obtener el estado:', error);
+    }
+  }, [token]);
+  
   // Función para obtener la última foto del sensor de movimiento
   const fetchSensorPhoto = useCallback(async () => {
     try {
@@ -55,11 +72,13 @@ function App() {
       setIsAuthenticated(true);
       fetchStatus();  // Obtiene el estado inicial de puertas y luces
       fetchSensorPhoto();  // Obtiene la foto inicial del sensor
+      fetchDoorStatus();
 
       // Configura el intervalo para actualizar el estado de puertas y la foto del sensor periódicamente
       const interval = setInterval(() => {
         fetchStatus();  // Actualiza las puertas y luces
         fetchSensorPhoto();  // Actualiza la foto del sensor
+        fetchDoorStatus();
       }, 1000);
 
       return () => clearInterval(interval);  // Limpia el intervalo cuando el componente se desmonta
