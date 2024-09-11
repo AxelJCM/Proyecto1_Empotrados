@@ -140,15 +140,21 @@ def change_light_status(light_name):
 @app.route('/doors', methods=['GET'])
 @token_required
 def get_doors_status():
-    door_status = {}
     for i in range(len(doors_pins)):
-        value_read = ct.create_string_buffer(4)
-        pind = doors_pins[i]
-        digitalRead(pind, value_read)
-        decoded_value = value_read.value.decode('utf-8')
-        print(f"Door {list(doors.keys())[i]} pin value: {decoded_value}")  # Agregar impresión para depuración
-        door_status[list(doors.keys())[i]] = 'open' if decoded_value == '1' else 'closed'
-    return jsonify({"doors": door_status}), 200
+        value_read = ct.create_string_buffer(4)  # string buffer para almacenar el valor leído
+        pind = doors_pins[i]  # selecciona el pin correspondiente
+        digitalRead(pind, value_read)  # lee el estado del pin
+        
+        # Actualiza el diccionario `doors` usando la clave correcta
+        if value_read.value.decode('utf-8') == '1':
+            door_name = list(doors.keys())[i]
+            doors[door_name] = 'open'
+        elif value_read.value.decode('utf-8') == '0':
+            door_name = list(doors.keys())[i]
+            doors[door_name] = 'closed'
+    
+    return jsonify({"doors": doors}), 200
+
 
 
 # Ruta para obtener el estado del sensor de movimiento
