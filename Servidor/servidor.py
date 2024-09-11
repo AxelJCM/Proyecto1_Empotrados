@@ -27,7 +27,7 @@ stop = True
 # Estado inicial de las luces, puertas y sensor de movimiento
 lights = {'Cuarto 1': 'off', 'Cuarto 2': 'off', 'Sala': 'off', 'Baño': 'off', 'Cocina': 'off'}  # 5 luces
 lights_pins = [b"517", b"518", b"525", b"531", b"538"]  # 5 luces
-doors = {'Principal': 'closed', 'Baño': 'closed', 'Cuarto 1': 'closed', 'Cuarto 2': 'closed'}  # 4 puertas
+doors = ['closed','closed','closed','closed'] # 4 puertas
 doors_pins = [b"529", b"539", b"534", b"537"]
 motion_sensor = 'No motion'  # Sensor de movimiento
 
@@ -138,15 +138,22 @@ def change_light_status(light_name):
     lights[light_name] = new_state
     return jsonify({"message": f"{light_name} is now {new_state}"}), 200
 
+# Ruta para obtener el estado de las puertas
 @app.route('/doors', methods=['GET'])
-@token_required
 def get_doors_status():
+    
     for i in range(len(doors_pins)):
-        value_read = ct.create_string_buffer(4)  # string buffer para almacenar el valor leído
-        pind = doors_pins[i]  # selecciona el pin correspondiente
-        digitalRead(pind, value_read)  # lee el estado del pin
-        doors[list(doors.keys())[i]] = 'open' if value_read.value.decode('utf-8') == '1' else 'closed'
-        print(f"Door {list(doors.keys())[i]} is {'open' if value_read.value.decode('utf-8') == '1' else 'closed'}")
+        value_read = ct.create_string_buffer(4) # string buffer
+        pind = doors_pins[i]
+        digitalRead(pind, value_read)
+        
+        if (value_read.value.decode('utf-8') == str(1)):
+            doors[i] = 'open'
+        elif(value_read.value.decode('utf-8') == str(0)):
+            doors[i] = 'closed'
+        
+        #print("Pin", pin2.decode('utf-8'), "value:", value_read.value.decode('utf-8'))
+    
     return jsonify({"doors": doors}), 200
 
 
