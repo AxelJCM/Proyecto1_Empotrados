@@ -98,7 +98,6 @@ def token_required(f):
 
 # Ruta para obtener el estado de las luces y puertas
 @app.route('/status', methods=['GET'])
-@token_required
 def get_status():
     return jsonify({
         'lights': lights,
