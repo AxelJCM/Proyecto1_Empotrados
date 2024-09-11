@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { HOSTNAME } from './Constant';
-import Tabs from './Tabs';  // Importa el componente de pestañas
-import Login from './Login'; // Asegúrate de que el archivo se llame Login.js
+import Tabs from './Tabs';  
+import Login from './Login'; 
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,6 +13,7 @@ function App() {
   const [sensorPhoto, setSensorPhoto] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || '');
 
+  // Función para obtener el estado de luces, puertas y sensor de movimiento
   const fetchStatus = useCallback(async () => {
     try {
       const response = await fetch(`${HOSTNAME}/status`, {
@@ -21,26 +22,47 @@ function App() {
         }
       });
       const data = await response.json();
-      setLightStatus(data.lights || {});  // Asegurarse de que siempre es un objeto
-      setDoorStatus(data.doors || {});    // Asegurarse de que siempre es un objeto
+      setLightStatus(data.lights || {});  
+      setDoorStatus(data.doors || {});    
       setMotionSensor(data.motion || 'No motion');
     } catch (error) {
       console.error('Error al obtener el estado:', error);
     }
   }, [token]);
 
+  // Función para obtener la última foto del sensor de movimiento
+  const fetchSensorPhoto = useCallback(async () => {
+    try {
+      const response = await fetch(`${HOSTNAME}/motion-sensor`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSensorPhoto(`data:image/jpeg;base64,${data.photo}`);
+      }
+    } catch (error) {
+      console.error('Error al obtener la última foto del sensor:', error);
+    }
+  }, [token]);
+
+  // Actualiza el estado de las puertas, sensor y la foto del sensor cada intervalo
   useEffect(() => {
     if (token) {
       setIsAuthenticated(true);
-      fetchStatus(); // Llama a fetchStatus cuando cambie el token
+      fetchStatus();  // Obtiene el estado inicial de puertas y luces
+      fetchSensorPhoto();  // Obtiene la foto inicial del sensor
 
+      // Configura el intervalo para actualizar el estado de puertas y la foto del sensor periódicamente
       const interval = setInterval(() => {
-        fetchStatus(); // Llama a fetchStatus en cada intervalo
-      }, 500); // Actualiza cada medio segundo
+        fetchStatus();  // Actualiza las puertas y luces
+        fetchSensorPhoto();  // Actualiza la foto del sensor
+      }, 500);  // Actualiza cada 5 segundos (5000 milisegundos)
 
-      return () => clearInterval(interval); // Limpia el intervalo al desmontar el componente
+      return () => clearInterval(interval);  // Limpia el intervalo cuando el componente se desmonta
     }
-  }, [token, fetchStatus]); // Añade fetchStatus como dependencia
+  }, [token, fetchStatus, fetchSensorPhoto]);
 
   const handleLogin = async (username, password) => {
     try {
@@ -87,22 +109,6 @@ function App() {
     }
   };
 
-  const handleGetLastPhoto = async () => {
-    try {
-      const response = await fetch(`${HOSTNAME}/motion-sensor`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setSensorPhoto(`data:image/jpeg;base64,${data.photo}`);
-      }
-    } catch (error) {
-      console.error('Error al obtener la última foto del sensor:', error);
-    }
-  };
-
   const toggleLight = async (room) => {
     const newState = lightStatus[room] === 'on' ? 'off' : 'on';
     setLightStatus({ ...lightStatus, [room]: newState });
@@ -117,7 +123,7 @@ function App() {
         body: JSON.stringify({ state: newState })
       });
       if (!response.ok && response.status === 401) {
-        handleLogout(); // Manejar el logout en caso de token inválido
+        handleLogout(); 
       }
     } catch (error) {
       console.error('Error al cambiar el estado de la luz:', error);
@@ -170,7 +176,7 @@ function App() {
         <div className="sensor-section">
           <h3>Sensor de Movimiento</h3>
           <p>{motionSensor}</p>
-          <button onClick={handleGetLastPhoto} className="sensor-button">Obtener Última Foto del Sensor</button>
+          {/* Aquí ya no es necesario el botón para el sensor */}
           {sensorPhoto && <img src={sensorPhoto} alt="Última foto del sensor" />}
         </div>
         <div className="camera-section">
@@ -183,7 +189,7 @@ function App() {
   );
 
   return (
-    <div className="home-manager">
+    <div className="house-control">
       <h1>Home Manager</h1>
       <button onClick={handleLogout} className="logout-button">Cerrar sesión</button>
       <Tabs
