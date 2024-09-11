@@ -22,6 +22,7 @@ function App() {
         }
       });
       const data = await response.json();
+      console.log('Fetched status data:', data);
       setLightStatus(data.lights || {});  
       setDoorStatus(data.doors || {});    
       setMotionSensor(data.motion || 'No motion');
@@ -34,6 +35,7 @@ function App() {
   const fetchSensorPhoto = useCallback(async () => {
     try {
       const response = await fetch(`${HOSTNAME}/motion-sensor`, {
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
         }
