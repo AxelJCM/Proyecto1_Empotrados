@@ -99,6 +99,7 @@ def token_required(f):
 # Ruta para obtener el estado de las luces y puertas
 @app.route('/status', methods=['GET'])
 def get_status():
+    print("Sending status response:", {'lights': lights, 'doors': doors, 'motion': motion_sensor})
     return jsonify({
         'lights': lights,
         'doors': doors,
@@ -144,16 +145,10 @@ def get_doors_status():
         value_read = ct.create_string_buffer(4)  # string buffer para almacenar el valor leído
         pind = doors_pins[i]  # selecciona el pin correspondiente
         digitalRead(pind, value_read)  # lee el estado del pin
-        
-        # Actualiza el diccionario `doors` usando la clave correcta
-        if value_read.value.decode('utf-8') == '1':
-            door_name = list(doors.keys())[i]
-            doors[door_name] = 'open'
-        elif value_read.value.decode('utf-8') == '0':
-            door_name = list(doors.keys())[i]
-            doors[door_name] = 'closed'
-    
+        doors[list(doors.keys())[i]] = 'open' if value_read.value.decode('utf-8') == '1' else 'closed'
+        print(f"Door {list(doors.keys())[i]} is {'open' if value_read.value.decode('utf-8') == '1' else 'closed'}")
     return jsonify({"doors": doors}), 200
+
 
 
 
