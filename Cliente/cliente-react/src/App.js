@@ -58,7 +58,7 @@ function App() {
       const interval = setInterval(() => {
         fetchStatus();  // Actualiza las puertas y luces
         fetchSensorPhoto();  // Actualiza la foto del sensor
-      }, 500);  // Actualiza cada 5 segundos (5000 milisegundos)
+      }, 1000);
 
       return () => clearInterval(interval);  // Limpia el intervalo cuando el componente se desmonta
     }
