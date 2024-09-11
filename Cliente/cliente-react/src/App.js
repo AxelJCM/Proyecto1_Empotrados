@@ -33,6 +33,12 @@ function App() {
     if (token) {
       setIsAuthenticated(true);
       fetchStatus(); // Llama a fetchStatus cuando cambie el token
+
+      const interval = setInterval(() => {
+        fetchStatus(); // Llama a fetchStatus en cada intervalo
+      }, 500); // Actualiza cada medio segundo
+
+      return () => clearInterval(interval); // Limpia el intervalo al desmontar el componente
     }
   }, [token, fetchStatus]); // Añade fetchStatus como dependencia
 
@@ -177,7 +183,7 @@ function App() {
   );
 
   return (
-    <div className="house-control">
+    <div className="home-manager">
       <h1>Home Manager</h1>
       <button onClick={handleLogout} className="logout-button">Cerrar sesión</button>
       <Tabs

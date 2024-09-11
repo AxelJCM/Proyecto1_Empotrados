@@ -88,10 +88,6 @@ def sensor_state():
 
         time.sleep(1)
     
-
-
-
-
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
@@ -186,7 +182,6 @@ def get_motion_sensor_status():
 
     return jsonify({"photo": picture}), 200
   
-
 # Ruta para simular tomar una foto
 @app.route('/take-photo', methods=['POST'])
 def take_photo():
@@ -195,8 +190,6 @@ def take_photo():
 
     # De momento, devolvemos una URL de ejemplo.
     return jsonify({"photo": picture}), 200
-
-
 
 if __name__ == '__main__':
 
